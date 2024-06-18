@@ -8,8 +8,9 @@ import (
 )
 
 func main() {
-	// Load Environment Variables
+	// Load Env & DB
 	loaders.LoadEnv()
+	loaders.LoadDB()
 
 	// Create Router
 	r := gin.Default()
