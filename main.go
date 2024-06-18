@@ -1,35 +1,22 @@
 package main
 
 import (
-	"log"
+	"Mohamed-Abdelrazeq/o-auth-2/handlers"
+	"Mohamed-Abdelrazeq/o-auth-2/loaders"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
 	// Load Environment Variables
-	loadEnv()
+	loaders.LoadEnv()
 
 	// Create Router
 	r := gin.Default()
 
 	// Test Router
-	r.GET("/ping", func(ctx *gin.Context) {
-		ctx.JSON(
-			200,
-			gin.H{
-				"message": "pong",
-			})
-	})
+	r.GET("/ping", handlers.Ping)
 
 	// Run Server
 	r.Run()
-}
-
-func loadEnv() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 }
