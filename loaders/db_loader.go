@@ -7,7 +7,11 @@ import (
 	"gorm.io/gorm"
 )
 
-func LoadDB() {
+type DatabaseInstance struct {
+	DB *gorm.DB
+}
+
+func LoadDB() *DatabaseInstance {
 	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
@@ -15,4 +19,7 @@ func LoadDB() {
 
 	// Migrate the schema
 	db.AutoMigrate(&models.User{})
+
+	// Init DB Instance
+	return &DatabaseInstance{db}
 }
