@@ -1,13 +1,18 @@
 package main
 
 import (
+	"Mohamed-Abdelrazeq/o-auth-2/internal/database"
 	"Mohamed-Abdelrazeq/o-auth-2/internal/handlers"
 	"Mohamed-Abdelrazeq/o-auth-2/internal/loaders"
 	"Mohamed-Abdelrazeq/o-auth-2/internal/services"
-	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
+type ErrorMap struct {
+	Message string `json:"message"`
+}
 
 func main() {
 	// Load Env & DB
@@ -27,12 +32,25 @@ func main() {
 	r.GET("/login", func(ctx *gin.Context) {
 		user, err := authService.GetUser("mohamed@gmail.com")
 		if err != nil {
-			fmt.Println(err)
+			ctx.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				ErrorMap{Message: "invalid credentials"},
+			)
+			return
 		}
 		ctx.JSON(200, user)
 	})
 
 	r.POST("/register", func(ctx *gin.Context) {
+		user, err := authService.CreateUser(&database.CreateUserParams{Email: "mohamed@gmail.com", Password: "123456s"})
+		if err != nil {
+			ctx.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				ErrorMap{Message: "email is used before"},
+			)
+			return
+		}
+		ctx.JSON(200, user)
 	})
 
 	// Run Server

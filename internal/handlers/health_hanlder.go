@@ -6,6 +6,6 @@ func Ping(ctx *gin.Context) {
 	ctx.JSON(
 		200,
 		gin.H{
-			"message": "ponggg",
+			"message": "pong",
 		})
 }
