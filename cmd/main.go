@@ -2,6 +2,7 @@ package main
 
 import (
 	"Mohamed-Abdelrazeq/o-auth-2/internal/handlers"
+	"Mohamed-Abdelrazeq/o-auth-2/internal/helpers"
 	"Mohamed-Abdelrazeq/o-auth-2/internal/loaders"
 	"Mohamed-Abdelrazeq/o-auth-2/internal/models"
 	"Mohamed-Abdelrazeq/o-auth-2/internal/services"
@@ -29,7 +30,7 @@ func main() {
 	r.GET("/ping", handlers.Ping)
 
 	// Auth Router
-	r.GET("/login", func(ctx *gin.Context) {
+	r.POST("/login", func(ctx *gin.Context) {
 		// Validation
 		var loginUserParams models.LoginUserParams
 		if err := ctx.ShouldBind(&loginUserParams); err != nil {
@@ -39,17 +40,35 @@ func main() {
 			)
 			return
 		}
-		// Logic
+		// DB
 		dbUser, err := authService.GetUser(loginUserParams.Email)
 		if err != nil {
-			ctx.AbortWithStatusJSON(
+			ctx.JSON(
 				http.StatusBadRequest,
-				ErrorMap{Message: "invalid credentials"},
+				ErrorMap{Message: err.Error()},
+			)
+			return
+		}
+		// Hashing
+		isVerified := helpers.VerifyPassword(loginUserParams.Password, dbUser.Password)
+		if !isVerified {
+			ctx.JSON(
+				http.StatusBadRequest,
+				ErrorMap{Message: "invalid credintials"},
+			)
+			return
+		}
+		// Token
+		token, err := helpers.NewAccessToken(models.UserClaims{Id: int(dbUser.ID)})
+		if err != nil {
+			ctx.JSON(
+				http.StatusBadRequest,
+				ErrorMap{Message: err.Error()},
 			)
 			return
 		}
 		// Return
-		ctx.JSON(200, dbUser)
+		ctx.JSON(200, models.Token{Token: token})
 	})
 
 	r.POST("/register", func(ctx *gin.Context) {
@@ -62,17 +81,28 @@ func main() {
 			)
 			return
 		}
-		// Logic
+		// Hashing
+		createUserParams.Password, _ = helpers.HashPassword(createUserParams.Password)
+		// DB
 		dbUser, err := authService.CreateUser(createUserParams.ConvertToDatabaseModel())
 		if err != nil {
-			ctx.AbortWithStatusJSON(
+			ctx.JSON(
+				http.StatusBadRequest,
+				ErrorMap{Message: err.Error()},
+			)
+			return
+		}
+		// Token
+		token, err := helpers.NewAccessToken(models.UserClaims{Id: int(dbUser.ID)})
+		if err != nil {
+			ctx.JSON(
 				http.StatusBadRequest,
 				ErrorMap{Message: err.Error()},
 			)
 			return
 		}
 		// Return
-		ctx.JSON(200, dbUser)
+		ctx.JSON(200, models.Token{Token: token})
 	})
 
 	// Run Server

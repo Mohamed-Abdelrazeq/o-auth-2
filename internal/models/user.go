@@ -12,12 +12,17 @@ type CreateUserParams struct {
 }
 
 type LoginUserParams struct {
-	Email string `json:"email" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type UserClaims struct {
 	Id int `json:"id" binding:"required"`
 	jwt.StandardClaims
+}
+
+type Token struct {
+	Token string `json:"toke"`
 }
 
 func (data CreateUserParams) ConvertToDatabaseModel() *database.CreateUserParams {
