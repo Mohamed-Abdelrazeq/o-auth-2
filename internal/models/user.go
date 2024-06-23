@@ -1,6 +1,10 @@
 package models
 
-import "Mohamed-Abdelrazeq/o-auth-2/internal/database"
+import (
+	"Mohamed-Abdelrazeq/o-auth-2/internal/database"
+
+	"github.com/golang-jwt/jwt"
+)
 
 type CreateUserParams struct {
 	Email    string `json:"email" binding:"required"`
@@ -9,6 +13,11 @@ type CreateUserParams struct {
 
 type LoginUserParams struct {
 	Email string `json:"email" binding:"required"`
+}
+
+type UserClaims struct {
+	Id int `json:"id" binding:"required"`
+	jwt.StandardClaims
 }
 
 func (data CreateUserParams) ConvertToDatabaseModel() *database.CreateUserParams {
