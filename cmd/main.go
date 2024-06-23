@@ -1,9 +1,9 @@
 package main
 
 import (
-	"Mohamed-Abdelrazeq/o-auth-2/internal/database"
 	"Mohamed-Abdelrazeq/o-auth-2/internal/handlers"
 	"Mohamed-Abdelrazeq/o-auth-2/internal/loaders"
+	"Mohamed-Abdelrazeq/o-auth-2/internal/models"
 	"Mohamed-Abdelrazeq/o-auth-2/internal/services"
 	"net/http"
 
@@ -30,7 +30,17 @@ func main() {
 
 	// Auth Router
 	r.GET("/login", func(ctx *gin.Context) {
-		user, err := authService.GetUser("mohamed@gmail.com")
+		// Validation
+		var loginUserParams models.LoginUserParams
+		if err := ctx.ShouldBind(&loginUserParams); err != nil {
+			ctx.JSON(
+				http.StatusBadRequest,
+				ErrorMap{Message: err.Error()},
+			)
+			return
+		}
+		// Logic
+		dbUser, err := authService.GetUser(loginUserParams.Email)
 		if err != nil {
 			ctx.AbortWithStatusJSON(
 				http.StatusBadRequest,
@@ -38,19 +48,31 @@ func main() {
 			)
 			return
 		}
-		ctx.JSON(200, user)
+		// Return
+		ctx.JSON(200, dbUser)
 	})
 
 	r.POST("/register", func(ctx *gin.Context) {
-		user, err := authService.CreateUser(&database.CreateUserParams{Email: "mohamed@gmail.com", Password: "123456s"})
-		if err != nil {
-			ctx.AbortWithStatusJSON(
+		// Validation
+		var createUserParams models.CreateUserParams
+		if err := ctx.ShouldBind(&createUserParams); err != nil {
+			ctx.JSON(
 				http.StatusBadRequest,
-				ErrorMap{Message: "email is used before"},
+				ErrorMap{Message: err.Error()},
 			)
 			return
 		}
-		ctx.JSON(200, user)
+		// Logic
+		dbUser, err := authService.CreateUser(createUserParams.ConvertToDatabaseModel())
+		if err != nil {
+			ctx.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				ErrorMap{Message: err.Error()},
+			)
+			return
+		}
+		// Return
+		ctx.JSON(200, dbUser)
 	})
 
 	// Run Server
