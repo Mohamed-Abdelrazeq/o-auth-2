@@ -3,17 +3,17 @@ package models
 import (
 	"Mohamed-Abdelrazeq/o-auth-2/internal/database"
 
+	_ "github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt"
 )
 
 type CreateUserParams struct {
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=6,max=128"`
 }
 
 type LoginUserParams struct {
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	CreateUserParams
 }
 
 type UserClaims struct {

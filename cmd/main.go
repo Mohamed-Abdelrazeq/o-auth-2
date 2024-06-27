@@ -9,11 +9,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
-
-type ErrorMap struct {
-	Message string `json:"message"`
-}
 
 func main() {
 	// Load Env & DB
@@ -31,12 +28,15 @@ func main() {
 
 	// Auth Router
 	r.POST("/login", func(ctx *gin.Context) {
-		// Validation
+		// Binding
 		var loginUserParams models.LoginUserParams
-		if err := ctx.ShouldBind(&loginUserParams); err != nil {
+		ctx.Bind(&loginUserParams)
+		// Validation
+		validate := validator.New()
+		if err := validate.Struct(loginUserParams); err != nil {
 			ctx.JSON(
 				http.StatusBadRequest,
-				ErrorMap{Message: err.Error()},
+				models.ErrorMap{Message: "invalid credintials"},
 			)
 			return
 		}
@@ -45,7 +45,7 @@ func main() {
 		if err != nil {
 			ctx.JSON(
 				http.StatusBadRequest,
-				ErrorMap{Message: err.Error()},
+				models.ErrorMap{Message: err.Error()},
 			)
 			return
 		}
@@ -54,7 +54,7 @@ func main() {
 		if !isVerified {
 			ctx.JSON(
 				http.StatusBadRequest,
-				ErrorMap{Message: "invalid credintials"},
+				models.ErrorMap{Message: "invalid credintials"},
 			)
 			return
 		}
@@ -63,7 +63,7 @@ func main() {
 		if err != nil {
 			ctx.JSON(
 				http.StatusBadRequest,
-				ErrorMap{Message: err.Error()},
+				models.ErrorMap{Message: err.Error()},
 			)
 			return
 		}
@@ -72,12 +72,15 @@ func main() {
 	})
 
 	r.POST("/register", func(ctx *gin.Context) {
-		// Validation
+		// Binding
 		var createUserParams models.CreateUserParams
-		if err := ctx.ShouldBind(&createUserParams); err != nil {
+		ctx.Bind(&createUserParams)
+		// Validation
+		validate := validator.New()
+		if err := validate.Struct(createUserParams); err != nil {
 			ctx.JSON(
 				http.StatusBadRequest,
-				ErrorMap{Message: err.Error()},
+				models.ErrorMap{Message: "invalid credintials"},
 			)
 			return
 		}
@@ -88,7 +91,7 @@ func main() {
 		if err != nil {
 			ctx.JSON(
 				http.StatusBadRequest,
-				ErrorMap{Message: err.Error()},
+				models.ErrorMap{Message: err.Error()},
 			)
 			return
 		}
@@ -97,7 +100,7 @@ func main() {
 		if err != nil {
 			ctx.JSON(
 				http.StatusBadRequest,
-				ErrorMap{Message: err.Error()},
+				models.ErrorMap{Message: err.Error()},
 			)
 			return
 		}
