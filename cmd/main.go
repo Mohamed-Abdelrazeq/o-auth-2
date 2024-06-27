@@ -1,6 +1,7 @@
 package main
 
 import (
+	apps "Mohamed-Abdelrazeq/o-auth-2/internal/application"
 	"Mohamed-Abdelrazeq/o-auth-2/internal/handlers"
 	"Mohamed-Abdelrazeq/o-auth-2/internal/helpers"
 	"Mohamed-Abdelrazeq/o-auth-2/internal/loaders"
@@ -19,6 +20,7 @@ func main() {
 
 	// Init AuthService
 	authService := services.NewAuthSericeInstance(db)
+	authApp := apps.NewAuthApplicationInstance(&authService)
 
 	// Create Router
 	r := gin.Default()
@@ -36,39 +38,21 @@ func main() {
 		if err := validate.Struct(loginUserParams); err != nil {
 			ctx.JSON(
 				http.StatusBadRequest,
-				models.ErrorMap{Message: "invalid credintials"},
+				models.ErrorMap{Message: "invalid body"},
 			)
 			return
 		}
-		// DB
-		dbUser, err := authService.GetUser(loginUserParams.Email)
+		token, err := authApp.Login(loginUserParams)
 		if err != nil {
-			ctx.JSON(
-				http.StatusBadRequest,
-				models.ErrorMap{Message: err.Error()},
-			)
-			return
-		}
-		// Hashing
-		isVerified := helpers.VerifyPassword(loginUserParams.Password, dbUser.Password)
-		if !isVerified {
 			ctx.JSON(
 				http.StatusBadRequest,
 				models.ErrorMap{Message: "invalid credintials"},
 			)
 			return
 		}
-		// Token
-		token, err := helpers.NewAccessToken(models.UserClaims{Id: int(dbUser.ID)})
-		if err != nil {
-			ctx.JSON(
-				http.StatusBadRequest,
-				models.ErrorMap{Message: err.Error()},
-			)
-			return
-		}
+
 		// Return
-		ctx.JSON(200, models.Token{Token: token})
+		ctx.JSON(200, token)
 	})
 
 	r.POST("/register", func(ctx *gin.Context) {
