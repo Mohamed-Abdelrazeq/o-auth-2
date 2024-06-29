@@ -33,7 +33,12 @@ func (authApplication AuthApplicationInstance) Login(loginUserParams models.Logi
 		return token, errors.New("invalid password")
 	}
 	// Token
-	token.Token, err = helpers.NewAccessToken(models.UserClaims{Id: int(dbUser.ID)})
+	token.Token, err = helpers.NewAccessToken(
+		models.UserClaims{
+			Id:       int(dbUser.ID),
+			IsActive: dbUser.IsActive,
+		},
+	)
 	if err != nil {
 		return token, err
 	}
@@ -51,7 +56,12 @@ func (authApplication AuthApplicationInstance) Register(createUserParams models.
 
 	}
 	// Token
-	token.Token, err = helpers.NewAccessToken(models.UserClaims{Id: int(dbUser.ID)})
+	token.Token, err = helpers.NewAccessToken(
+		models.UserClaims{
+			Id:       int(dbUser.ID),
+			IsActive: dbUser.IsActive,
+		},
+	)
 	if err != nil {
 		return token, err
 	}
