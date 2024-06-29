@@ -1,6 +1,7 @@
 -- +goose Up
 ALTER TABLE users
 Add is_active bool
+NOT NULL
 DEFAULT true;
 
 -- +goose Down

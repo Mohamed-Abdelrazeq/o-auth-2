@@ -15,7 +15,7 @@ INSERT INTO users (
 ) VALUES (
     ?, ?
 )
-RETURNING id, email, password
+RETURNING id, email, password, is_active
 `
 
 type CreateUserParams struct {
@@ -26,12 +26,17 @@ type CreateUserParams struct {
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.Password)
 	var i User
-	err := row.Scan(&i.ID, &i.Email, &i.Password)
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.IsActive,
+	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, password 
+SELECT id, email, password, is_active 
 FROM users
 WHERE email = ? 
 LIMIT 1
@@ -40,6 +45,11 @@ LIMIT 1
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
 	var i User
-	err := row.Scan(&i.ID, &i.Email, &i.Password)
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.IsActive,
+	)
 	return i, err
 }
