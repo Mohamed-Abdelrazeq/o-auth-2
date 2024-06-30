@@ -16,7 +16,7 @@ type AuthApplicationInstance struct {
 	authService services.AuthService
 }
 
-func NewAuthApplicationInstance(authService services.AuthService) AuthApplicationInstance {
+func NewAuthApplicationInstance(authService services.AuthService) AuthApplication {
 	return AuthApplicationInstance{authService: authService}
 }
 

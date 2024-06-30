@@ -18,7 +18,7 @@ type AuthHandlerInstance struct {
 	authApp apps.AuthApplication
 }
 
-func NewAuthHandlerInstance(authApp apps.AuthApplication) AuthHandlerInstance {
+func NewAuthHandlerInstance(authApp apps.AuthApplication) AuthHandler {
 	return AuthHandlerInstance{authApp: authApp}
 }
 

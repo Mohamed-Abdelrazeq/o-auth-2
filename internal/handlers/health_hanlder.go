@@ -7,5 +7,6 @@ func Ping(ctx *gin.Context) {
 		200,
 		gin.H{
 			"message": "pong",
-		})
+		},
+	)
 }
