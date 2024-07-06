@@ -2,7 +2,7 @@ package helpers
 
 import (
 	"Mohamed-Abdelrazeq/o-auth-2/internal/models"
-	"fmt"
+	"errors"
 	"os"
 
 	"github.com/golang-jwt/jwt"
@@ -16,18 +16,19 @@ func NewAccessToken(claims models.UserClaims) (string, error) {
 }
 
 // Parse JWT
-func VerifyToken(tokenString string) error {
+func VerifyToken(tokenString string) (models.UserClaims, error) {
+	var userClaims = models.UserClaims{}
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("TOKEN_SECRET")), nil
 	})
 
 	if err != nil {
-		return err
+		return userClaims, err
 	}
 
 	if !token.Valid {
-		return fmt.Errorf("invalid token")
+		return userClaims, errors.New("invalid token")
 	}
 
-	return nil
+	return userClaims, nil
 }
