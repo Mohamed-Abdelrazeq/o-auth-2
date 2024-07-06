@@ -17,8 +17,9 @@ type LoginUserParams struct {
 }
 
 type UserClaims struct {
-	Id       int  `json:"id" binding:"required"`
-	IsActive bool `json:"is_active" binding:"required"`
+	Id        int   `json:"id" binding:"required"`
+	IsActive  bool  `json:"is_active" binding:"required"`
+	ExpiresAt int64 `json:"expires_at" binding:"required"`
 	jwt.StandardClaims
 }
 

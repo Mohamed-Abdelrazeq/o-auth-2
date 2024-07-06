@@ -5,6 +5,7 @@ import (
 	"Mohamed-Abdelrazeq/o-auth-2/internal/models"
 	"Mohamed-Abdelrazeq/o-auth-2/internal/services"
 	"errors"
+	"time"
 )
 
 type AuthApplication interface {
@@ -35,8 +36,9 @@ func (authApplication AuthApplicationInstance) Login(loginUserParams models.Logi
 	// Token
 	token.Token, err = helpers.NewAccessToken(
 		models.UserClaims{
-			Id:       int(dbUser.ID),
-			IsActive: dbUser.IsActive,
+			Id:        int(dbUser.ID),
+			IsActive:  dbUser.IsActive,
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 		},
 	)
 	if err != nil {
