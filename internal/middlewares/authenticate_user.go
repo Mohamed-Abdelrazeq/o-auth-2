@@ -34,10 +34,11 @@ func AuthenticateUser() gin.HandlerFunc {
 		if err != nil {
 			ctx.JSON(
 				http.StatusBadRequest,
-				models.ErrorMap{Message: "invalid token"},
+				models.ErrorMap{Message: err.Error()},
 			)
 			return
 		}
+
 		ctx.Set("user_claims", userClaims)
 		ctx.Next()
 	}
