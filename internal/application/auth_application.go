@@ -38,9 +38,11 @@ func (authApplication AuthApplicationInstance) Login(loginUserParams models.Logi
 		models.UserClaims{
 			Id:        int(dbUser.ID),
 			IsActive:  dbUser.IsActive,
-			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+			ExpiresAt: time.Now().Add(time.Second * 20).Unix(),
 		},
 	)
+
+	println(int(dbUser.ID), dbUser.IsActive, time.Now().Add(time.Second*20).Unix())
 	if err != nil {
 		return token, err
 	}
@@ -60,10 +62,12 @@ func (authApplication AuthApplicationInstance) Register(createUserParams models.
 	// Token
 	token.Token, err = helpers.NewAccessToken(
 		models.UserClaims{
-			Id:       int(dbUser.ID),
-			IsActive: dbUser.IsActive,
+			Id:        int(dbUser.ID),
+			IsActive:  dbUser.IsActive,
+			ExpiresAt: time.Now().Add(time.Second * 20).Unix(),
 		},
 	)
+
 	if err != nil {
 		return token, err
 	}

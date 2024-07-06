@@ -16,19 +16,18 @@ func NewAccessToken(claims models.UserClaims) (string, error) {
 }
 
 // Parse JWT
-func VerifyToken(tokenString string) (models.UserClaims, error) {
-	var userClaims = models.UserClaims{}
+func VerifyToken(tokenString string) (jwt.Claims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("TOKEN_SECRET")), nil
 	})
 
 	if err != nil {
-		return userClaims, err
+		return token.Claims, err
 	}
 
 	if !token.Valid {
-		return userClaims, errors.New("invalid token")
+		return token.Claims, errors.New("invalid token")
 	}
 
-	return userClaims, nil
+	return token.Claims, nil
 }
